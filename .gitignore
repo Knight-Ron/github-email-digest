@@ -1,0 +1,31 @@
+# Ignore system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Ignore temporary files
+*.log
+*.tmp
+
+# Ignore IDE/workspace settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore environment files (optional, if you use .env)
+.env
+
+# Ignore composer dependencies (if you use Composer)
+vendor/
+
+# Ignore backup/swap files
+*~
+*.swp
+*.bak
+
+# XAMPP/PHP cache files
+*.cache
+
+# Ignore mail queue (if you log or store email data locally)
+mail_output/
