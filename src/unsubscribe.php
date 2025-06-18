@@ -1,56 +1,27 @@
 <?php
-session_start(); // Store temporary verification/unsubscription codes
+session_start(); // Initialize session to store unsubscription code and email
 
-require_once 'functions.php';
+require_once 'functions.php'; // Load utility functions for email handling
 
 $message = '';
 
+// Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // --- Subscription flow ---
-    if (isset($_POST['email'])) {
-        $email = trim($_POST['email']);
 
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $code = generateVerificationCode();
-            $_SESSION['verification_code'] = $code;
-            $_SESSION['email'] = $email;
-
-            if (sendVerificationEmail($email, $code)) {
-                $message = "A verification code was sent to $email.";
-            } else {
-                $message = "Failed to send verification code. Please try again.";
-            }
-        } else {
-            $message = "Invalid email format.";
-        }
-    }
-
-    if (isset($_POST['verification_code'])) {
-        $userCode = trim($_POST['verification_code']);
-
-        if ($userCode === ($_SESSION['verification_code'] ?? '')) {
-            if (registerEmail($_SESSION['email'])) {
-                $message = "Email registered successfully!";
-            } else {
-                $message = "Email is already registered.";
-            }
-            unset($_SESSION['verification_code'], $_SESSION['email']);
-        } else {
-            $message = "Incorrect verification code.";
-        }
-    }
-
-    // --- Unsubscription flow ---
+    // Step 1: User submits their email to request unsubscription
     if (isset($_POST['unsubscribe_email'])) {
         $email = trim($_POST['unsubscribe_email']);
 
+        // Check if email format is valid
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $file = __DIR__ . '/registered_emails.txt';
             $emails = file_exists($file) ? file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [];
 
+            // Check if the email is already registered
             if (!in_array($email, $emails)) {
                 $message = "This email is not subscribed.";
             } else {
+                // Generate and send unsubscription code
                 $code = generateVerificationCode();
                 $_SESSION['unsubscribe_code'] = $code;
                 $_SESSION['unsubscribe_email'] = $email;
@@ -66,16 +37,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Step 2: User submits the unsubscription verification code
     if (isset($_POST['unsubscribe_verification_code'])) {
         $code = trim($_POST['unsubscribe_verification_code']);
         $email = $_SESSION['unsubscribe_email'] ?? '';
 
+        // Verify code match
         if ($code === ($_SESSION['unsubscribe_code'] ?? '')) {
+            // Attempt to remove the email from subscribers list
             if (unsubscribeEmail($email)) {
                 $message = "You have been unsubscribed.";
             } else {
                 $message = "Email not found or already unsubscribed.";
             }
+            // Clear session data after use
             unset($_SESSION['unsubscribe_code'], $_SESSION['unsubscribe_email']);
         } else {
             $message = "Incorrect unsubscription code.";
@@ -83,21 +58,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GitHub Email Digest</title>
+    <title>Unsubscribe | GitHub Email Digest</title>
     <style>
+        /* Light and dark theme variables */
         :root {
             --bg-color: #f0f4f8;
             --text-color: #333;
             --card-bg: white;
             --input-bg: white;
-            --btn-bg: #0366d6;
-            --btn-hover: #024a9c;
-            --btn-red: #d93025;
-            --btn-red-hover: #a5251b;
+            --btn-bg:rgb(214, 3, 3);
+            --btn-hover:rgba(156, 2, 2, 0.56);
             --alert-success-bg: #e6f4ea;
             --alert-error-bg: #fdecea;
             --alert-success-color: #256029;
@@ -109,10 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --text-color: #eee;
             --card-bg: #1e1e1e;
             --input-bg: #2c2c2c;
-            --btn-bg: #0a84ff;
-            --btn-hover: #0060c0;
-            --btn-red: #ff3b30;
-            --btn-red-hover: #cc2e26;
+            --btn-bg:rgb(255, 10, 10);
+            --btn-hover: rgba(156, 2, 2, 0.56);
             --alert-success-bg: #1f3b2e;
             --alert-error-bg: #3e1c1a;
             --alert-success-color: #b9fbc0;
@@ -128,60 +101,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .container {
-            max-width: 550px;
+            max-width: 500px;
             margin: auto;
             background: var(--card-bg);
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
         }
 
         h1 {
             text-align: center;
             color: var(--btn-bg);
-            margin-bottom: 20px;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px 0;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .tab-btn.subscribe {
-            background-color: #dce3ec;
-        }
-
-        .tab-btn.unsubscribe {
-            background-color: #f5d7d7;
-        }
-
-        .tab-btn.subscribe.active {
-            background-color: var(--btn-bg);
-            color: white;
-        }
-
-        .tab-btn.unsubscribe.active {
-            background-color: var(--btn-red);
-            color: white;
-        }
-
-        .form-section {
-            display: none;
-        }
-
-        .form-section.active {
-            display: block;
+            margin-bottom: 10px;
         }
 
         input, button {
@@ -195,31 +126,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--text-color);
         }
 
-        button.subscribe-btn {
+        button {
             background-color: var(--btn-bg);
             color: white;
             border: none;
         }
 
-        button.subscribe-btn:hover {
+        button:hover {
             background-color: var(--btn-hover);
-        }
-
-        button.unsubscribe-btn {
-            background-color: var(--btn-red);
-            color: white;
-            border: none;
-        }
-
-        button.unsubscribe-btn:hover {
-            background-color: var(--btn-red-hover);
         }
 
         .alert {
             padding: 12px;
             margin-top: 20px;
             border-radius: 5px;
-            display: block;
         }
 
         .success {
@@ -242,14 +162,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .toggle-theme {
-            text-align: center;
-            margin-bottom: 20px;
+            text-align: right;
+            margin-bottom: 15px;
         }
 
         .toggle-theme button {
             background: none;
             border: 1px solid var(--text-color);
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
             cursor: pointer;
             color: var(--text-color);
@@ -263,45 +183,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <div class="container">
+
+    <!-- Dark/light mode toggle -->
     <div class="toggle-theme">
         <button onclick="toggleDarkMode()" id="theme-toggle-btn">
             <span id="theme-icon">🌙</span> <span id="theme-label">Toggle Dark Mode</span>
         </button>
     </div>
 
-    <h1>GitHub Email Digest</h1>
+    <h1>Unsubscribe from Updates</h1>
 
-    <div class="tabs">
-        <button class="tab-btn subscribe active" onclick="switchTab('subscribe')">Subscribe</button>
-        <button class="tab-btn unsubscribe" onclick="switchTab('unsubscribe')">Unsubscribe</button>
-    </div>
+    <!-- Step 1: Request unsubscription code -->
+    <form method="POST">
+        <input type="email" name="unsubscribe_email" required placeholder="Enter your email">
+        <button type="submit">Send Unsubscribe Code</button>
+    </form>
 
-    <div id="subscribe" class="form-section active">
-        <form method="POST">
-            <input type="email" name="email" required placeholder="Enter your email">
-            <button type="submit" class="subscribe-btn">Send Verification Code</button>
-        </form>
+    <!-- Step 2: Submit verification code to confirm unsubscription -->
+    <form method="POST">
+        <input type="text" name="unsubscribe_verification_code" maxlength="6" required placeholder="Enter code to confirm unsubscription">
+        <button type="submit">Confirm Unsubscribe</button>
+    </form>
 
-        <form method="POST">
-            <input type="text" name="verification_code" maxlength="6" required placeholder="Enter verification code">
-            <button type="submit" class="subscribe-btn">Verify & Subscribe</button>
-        </form>
-    </div>
-
-    <div id="unsubscribe" class="form-section">
-        <form method="POST">
-            <input type="email" name="unsubscribe_email" required placeholder="Enter your email">
-            <button type="submit" class="unsubscribe-btn">Send Unsubscribe Code</button>
-        </form>
-
-        <form method="POST">
-            <input type="text" name="unsubscribe_verification_code" maxlength="6" required placeholder="Enter code to confirm unsubscription">
-            <button type="submit" class="unsubscribe-btn">Confirm Unsubscribe</button>
-        </form>
-    </div>
-
+    <!-- Show result messages -->
     <?php if (!empty($message)): ?>
-        <div class="alert <?= strpos($message, 'successfully') || strpos($message, 'sent') || strpos($message, 'unsubscribed') ? 'success' : 'error' ?>">
+        <div class="alert <?= strpos($message, 'unsubscribed') || strpos($message, 'sent') ? 'success' : 'error' ?>">
             <?= htmlspecialchars($message) ?>
         </div>
     <?php endif; ?>
@@ -312,17 +218,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </footer>
 
 <script>
-    // Handle switching between Subscribe and Unsubscribe tabs
-    function switchTab(tabName) {
-        document.getElementById('subscribe').classList.remove('active');
-        document.getElementById('unsubscribe').classList.remove('active');
-        document.getElementById(tabName).classList.add('active');
-
-        const buttons = document.querySelectorAll('.tab-btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
-        document.querySelector(`.tab-btn.${tabName}`).classList.add('active');
-    }
-
     // Toggle dark mode and store user preference
     function toggleDarkMode() {
         const isDark = document.body.classList.toggle('dark');
@@ -330,14 +225,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         updateThemeToggle(isDark);
     }
 
+    // Update button icon and label based on theme state
     function updateThemeToggle(isDark) {
         document.getElementById('theme-icon').textContent = isDark ? '🌞' : '🌙';
         document.getElementById('theme-label').textContent = isDark ? 'Toggle Light Mode' : 'Toggle Dark Mode';
     }
 
+    // Apply theme preference on page load
     window.onload = () => {
         const isDark = localStorage.getItem('theme') === 'dark';
-        if (isDark) document.body.classList.add('dark');
+        if (isDark) {
+            document.body.classList.add('dark');
+        }
         updateThemeToggle(isDark);
     };
 </script>

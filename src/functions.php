@@ -10,7 +10,7 @@ function sendVerificationEmail(string $email, string $code): bool {
     $subject = "Your Verification Code";
     $message = "<p>Your verification code is: <strong>$code</strong></p>";
     $message .= "<p>If you did not request this, please ignore.</p>";
-    $message .= "<p>To unsubscribe, please visit the <a href=\"http://localhost/github-timeline-Knight-Ron/src/index.php\">unsubscribe page</a> and follow the steps.</p>";
+    $message .= "<p>To unsubscribe, please visit the <a href=\"http://localhost/github-email-digest/src/unsubscribe.php\">unsubscribe page</a> and follow the steps.</p>";
     $headers = "From: ronaldjwork@gmail.com\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 
@@ -129,7 +129,7 @@ function sendGitHubUpdatesToSubscribers(): void {
     $formatted = formatGitHubData($data);
 
     foreach ($emails as $email) {
-        $unsubscribeLink = "http://localhost/github-timeline-Knight-Ron/src/index.php";
+        $unsubscribeLink = "http://localhost/github-email-digest/src/unsubscribe.php";
         $body = $formatted . "<p>To unsubscribe, please visit the <a href=\"$unsubscribeLink\">unsubscribe page</a>.</p>";
 
         $subject = "Latest GitHub Updates";
