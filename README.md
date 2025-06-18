@@ -103,5 +103,4 @@ This project is licensed under the MIT License.
 
 ## 🙋 Author
 
-Ronald Jacob
-https://www.linkedin.com/in/ronaldjacob/
+[Ronald Jacob](https://www.linkedin.com/in/ronaldjacob/)
