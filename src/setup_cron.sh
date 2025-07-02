@@ -1,20 +1,25 @@
 #!/bin/bash
 # setup_cron.sh - Automatically sets a CRON job to run cron.php every 5 minutes
 
-# Get absolute path to cron.php
+# Resolve absolute path to cron.php
 CRON_PATH="$(cd "$(dirname "$0")" && pwd)/cron.php"
 CRON_JOB="*/5 * * * * php $CRON_PATH"
 
-# Check if the CRON job already exists
-if crontab -l 2>/dev/null | grep -Fxq "$CRON_JOB"; then
-    echo "✅ CRON job already set."
-    exit 0
+# Check if cron.php is executable
+if [ ! -f "$CRON_PATH" ]; then
+    echo "❌ cron.php not found at: $CRON_PATH"
+    exit 1
 fi
 
-# Add the CRON job
-(crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
-echo "✅ CRON job added: $CRON_JOB"
+# Check if the CRON job already exists
+if crontab -l 2>/dev/null | grep -Fxq "$CRON_JOB"; then
+    echo "✅ CRON job already exists and is active."
+else
+    (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
+    echo "✅ CRON job added: $CRON_JOB"
+fi
 
-# Instructions
+# Final note
 echo ""
-echo "ℹ️  To remove the CRON job later, run: crontab -e"
+echo "ℹ️  This script sets up a background job to run every 5 minutes."
+echo "🔧 To view or edit crontab manually, run: crontab -e"

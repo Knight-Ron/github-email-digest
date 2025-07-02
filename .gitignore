@@ -1,35 +1,55 @@
-# =============================
-# OS and System Files
-# =============================
+# ==================================
+# Operating System Files
+# ==================================
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# =============================
-# IDE and Editor Config
-# =============================
+# ==================================
+# IDE / Editor Settings
+# ==================================
 .vscode/
 .idea/
-*.sublime-project
-*.sublime-workspace
+*.sublime-*
 
-# =============================
-# Backup and Swap Files
-# =============================
-*~
-*.swp
+# ==================================
+# Temporary & Backup Files
+# ==================================
 *.bak
+*.swp
+*.tmp
+*~
+*.cache
 
-# =============================
-# Project Runtime & Secrets
-# =============================
-.env                 # Environment config
-*.log                # Log files
-*.tmp                # Temp files
-*.cache              # Cache files
-cron.log             # Cron job logs
+# ==================================
+# Composer & Vendor
+# ==================================
+/vendor/
+/composer.lock
 
-# Runtime-generated
-mail_output/         # If you're storing test mail content here
-registered_emails.txt  # Contains subscriber data (PII)
-cron.php             # Trigger script — don't expose it publicly
+# ==================================
+# Environment & Secrets
+# ==================================
+.env
+.env.*
+
+# ==================================
+# Application Runtime Files
+# ==================================
+*.log
+cron.log
+registered_emails.txt
+
+# If you store mail output locally
+/mail_output/
+
+# ==================================
+# Scripts or dev-only tools
+# ==================================
+cron.php
+setup_cron.sh
+
+# ==================================
+# Node-style ignores (just in case)
+# ==================================
+node_modules/

@@ -65,14 +65,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Unsubscribe | GitHub Email Digest</title>
     <style>
-        /* Light and dark theme variables */
         :root {
             --bg-color: #f0f4f8;
             --text-color: #333;
             --card-bg: white;
             --input-bg: white;
-            --btn-bg:rgb(214, 3, 3);
-            --btn-hover:rgba(156, 2, 2, 0.56);
+            --btn-bg: rgb(214, 3, 3);
+            --btn-hover: rgba(156, 2, 2, 0.56);
             --alert-success-bg: #e6f4ea;
             --alert-error-bg: #fdecea;
             --alert-success-color: #256029;
@@ -84,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --text-color: #eee;
             --card-bg: #1e1e1e;
             --input-bg: #2c2c2c;
-            --btn-bg:rgb(255, 10, 10);
+            --btn-bg: rgb(255, 10, 10);
             --btn-hover: rgba(156, 2, 2, 0.56);
             --alert-success-bg: #1f3b2e;
             --alert-error-bg: #3e1c1a;
@@ -158,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
             margin-top: 30px;
             font-size: 0.9rem;
-            color: #777;
+            color: var(--text-color);
         }
 
         .toggle-theme {
@@ -218,20 +217,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </footer>
 
 <script>
-    // Toggle dark mode and store user preference
     function toggleDarkMode() {
         const isDark = document.body.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
         updateThemeToggle(isDark);
     }
 
-    // Update button icon and label based on theme state
     function updateThemeToggle(isDark) {
         document.getElementById('theme-icon').textContent = isDark ? '🌞' : '🌙';
         document.getElementById('theme-label').textContent = isDark ? 'Toggle Light Mode' : 'Toggle Dark Mode';
     }
 
-    // Apply theme preference on page load
     window.onload = () => {
         const isDark = localStorage.getItem('theme') === 'dark';
         if (isDark) {
