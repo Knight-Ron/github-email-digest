@@ -35,6 +35,15 @@ GitHub Email Digest is a beginner-friendly, file-based PHP tool that:
 
 ---
 
+## Example of input form:
+<img width="400" height="400" alt="Screenshot 2025-07-15 122854" src="https://github.com/user-attachments/assets/94a9c15b-43fd-4e73-9bd4-428ff3e33a60" />
+<img width="400" height="400" alt="Screenshot 2025-07-15 123431" src="https://github.com/user-attachments/assets/50fa7fd0-dadc-4df9-a58e-f927fb35d82f" />
+
+## Sample Output
+<img width="350" height="290" alt="Screenshot 2025-07-15 124831" src="https://github.com/user-attachments/assets/745dcc86-366e-4c4f-8cd9-6d7ba4f87d59" />
+<img width="600" height="300" alt="Screenshot 2025-07-15 124603" src="https://github.com/user-attachments/assets/7578308a-ac3d-4611-97f4-e9819878acda" />
+<img width="350" height="265" alt="Screenshot 2025-07-15 124846" src="https://github.com/user-attachments/assets/c202e9cc-ae9d-4a41-99a8-144b95ec871c" />
+
 ## Tech Stack
 
 * PHP 7.4+
